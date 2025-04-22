@@ -49,7 +49,10 @@ tasks_service = build("tasks", "v1", credentials=creds)
 
 
 async def create_calendar_event(
-    summary: str, start_time: str, end_time: str
+    summary: str,
+    start_time: str,
+    end_time: str,
+    calendar_id: str = os.getenv("CALENDAR_ID"),
 ) -> Dict[str, Any]:
     """Create a new calendar event.
 
@@ -57,6 +60,7 @@ async def create_calendar_event(
         summary (str): Summary of the event.
         start_time (str): Start time in ISO format.
         end_time (str): End time in ISO format.
+        calendar_id (str): Calendar ID. Defaults to the environment variable CALENDAR_ID.
     """
     print(f"Creating new event '{summary}'...")
 
@@ -70,7 +74,7 @@ async def create_calendar_event(
     # Insert new event
     created_event = (
         calendar_service.events()
-        .insert(calendarId=os.getenv("CALENDAR_ID"), body=event_body)
+        .insert(calendarId=calendar_id, body=event_body)
         .execute()
     )
 
