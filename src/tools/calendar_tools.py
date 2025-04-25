@@ -92,12 +92,17 @@ async def list_calendars() -> List[Dict[str, Any]]:
     return calendars
 
 
-async def get_calendar_events(id=None, date=None) -> List[CalendarEvent]:
-    """Fetch calendar events for the specified date (today by default)."""
+async def get_calendar_events(
+    id=os.getenv("CALENDAR_ID"), date=None
+) -> List[CalendarEvent]:
+    """Fetch calendar events for the specified date (today by default).
+
+    Args:
+        id (str): Calendar ID. Defaults to 'CALENDAR_ID' found in the environment variables.
+        date (datetime): Date for which to fetch events. Defaults to today.
+    """
     if not date:
         date = datetime.now(timezone)
-    if id is None:
-        id = "primary"
 
     # Set time boundaries for the day
     start_time = date.replace(hour=0, minute=0, second=0).isoformat()
@@ -119,8 +124,8 @@ async def get_calendar_events(id=None, date=None) -> List[CalendarEvent]:
         CalendarEvent(
             id=event["id"],
             summary=event.get("summary", "No summary"),
-            start=event["start"]["dateTime"],
-            end=event["end"]["dateTime"],
+            start=event["start"].get("dateTime", event["start"].get("date")),
+            end=event["end"].get("dateTime", event["end"].get("date")),
         )
         for event in events_result.get("items", [])
     ]
